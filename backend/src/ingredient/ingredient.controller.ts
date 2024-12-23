@@ -10,7 +10,7 @@ export class IngredientController {
 
     @Post()
     async create(@Body() ingredient: Partial<Ingredient>) {
-        return await this.ingredientService.create(ingredient);
+        return await this.ingredientService.softCreate(ingredient);
     }
 
     @Get()
