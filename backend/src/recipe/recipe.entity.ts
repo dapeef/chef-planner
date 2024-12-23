@@ -22,3 +22,11 @@ export class Recipe {
     @OneToMany(() => RecipeIngredient, (recipeIngredient) => recipeIngredient.recipe, {cascade: true})
     recipeIngredients: RecipeIngredient[];
 }
+
+export interface RecipeCreator {
+    title: string;
+    description?: string;
+    preparationTime: number;
+    cookingTime: number;
+    recipeIngredientIds: string[];
+}

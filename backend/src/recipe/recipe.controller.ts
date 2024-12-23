@@ -1,6 +1,6 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { RecipeService } from './recipe.service';
-import { Recipe } from './recipe.entity';
+import { Recipe, RecipeCreator } from './recipe.entity';
 
 @Controller('recipe')
 export class RecipeController {
@@ -9,7 +9,17 @@ export class RecipeController {
     ) {}
 
     @Post()
-    async create(@Body() recipe: Partial<Recipe>) {
-        return await this.recipeService.create(recipe);
+    async create(@Body() recipeIngredient: RecipeCreator) {
+        return await this.recipeService.create(recipeIngredient);
+    }
+
+    @Get()
+    async findById(@Body('id') id: string): Promise<Recipe> {
+        return await this.recipeService.findById(id);
+    }
+
+    @Get('all')
+    async findAll(): Promise<Recipe[]> {
+        return await this.recipeService.findAll();
     }
 }

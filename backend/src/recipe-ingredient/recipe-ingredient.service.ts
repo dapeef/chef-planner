@@ -27,4 +27,12 @@ export class RecipeIngredientService {
         const recipeIngredient = this.recipeIngredientRepository.create(partialRecipeIngredient);
         return await this.recipeIngredientRepository.save(recipeIngredient);
     }
+
+    async findAll(): Promise<RecipeIngredient[]> {
+        return await this.recipeIngredientRepository.find();
+    }
+
+    async findById(id: string): Promise<RecipeIngredient> {
+        return await this.recipeIngredientRepository.findOneBy({id: id});
+    }
 }
