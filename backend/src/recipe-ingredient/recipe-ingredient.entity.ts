@@ -1,12 +1,12 @@
-import {Entity, PrimaryGeneratedColumn, Column, ManyToOne} from 'typeorm';
-import {Recipe} from "../recipe/recipe.entity";
-import {Ingredient} from "../ingredient/ingredient.entity";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Recipe } from '../recipe/recipe.entity';
+import { Ingredient } from '../ingredient/ingredient.entity';
 
 // RecipeIngredient Entity (Join Table for Recipes and Ingredients)
 @Entity('recipe_ingredients')
 export class RecipeIngredient {
     @PrimaryGeneratedColumn('uuid')
-    id: number;
+    id: string;
 
     @ManyToOne(() => Recipe, (recipe) => recipe.recipeIngredients)
     recipe: Recipe;
@@ -18,5 +18,11 @@ export class RecipeIngredient {
     quantity: number;
 
     @Column()
-    unit: string | null; // e.g., "grams", "cups", "tablespoons"
+    units: string | null; // e.g., "grams", "cups", "tablespoons"
+}
+
+export interface RecipeIngredientCreator {
+    ingredientId: string;
+    quantity: number;
+    units: string | null;
 }

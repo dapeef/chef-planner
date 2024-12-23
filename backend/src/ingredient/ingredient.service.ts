@@ -15,4 +15,12 @@ export class IngredientService {
         const ingredient = this.ingredientRepository.create(ingredientData);
         return await this.ingredientRepository.save(ingredient);
     }
+
+    async findAll(): Promise<Ingredient[]> {
+        return await this.ingredientRepository.find();
+    }
+
+    async findById(id: string): Promise<Ingredient> {
+        return await this.ingredientRepository.findOneBy({id: id});
+    }
 }

@@ -5,7 +5,7 @@ import { RecipeIngredient } from '../recipe-ingredient/recipe-ingredient.entity'
 @Entity('recipes')
 export class Recipe {
     @PrimaryGeneratedColumn('uuid')
-    id: number;
+    id: string;
 
     @Column()
     title: string;
