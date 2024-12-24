@@ -11,7 +11,7 @@ export async function getRecipes(): Promise<Recipe[]> {
             cookingTime: 30,
             servings: 4,
             // Either provide a real image URL or remove the imageUrl property
-            // imageUrl: "https://example.com/carbonara.jpg"
+            imageUrl: 'https://picsum.photos/500/300',
         },
         {
             id: '2',
@@ -19,7 +19,7 @@ export async function getRecipes(): Promise<Recipe[]> {
             description: 'Quick and healthy stir-fried chicken with colorful vegetables in a savory sauce. Perfect for busy weeknight dinners.',
             cookingTime: 25,
             servings: 3,
-            // imageUrl: "https://example.com/stirfry.jpg"
+            imageUrl: 'https://picsum.photos/500/300',
         },
         {
             id: '3',
@@ -27,7 +27,7 @@ export async function getRecipes(): Promise<Recipe[]> {
             description: 'Aromatic Indian-style curry packed with fresh vegetables and warming spices. A hearty vegetarian meal that\'s full of flavor.',
             cookingTime: 45,
             servings: 4,
-            // imageUrl: "https://example.com/curry.jpg"
+            imageUrl: 'https://picsum.photos/500/300',
         },
     ];
 
