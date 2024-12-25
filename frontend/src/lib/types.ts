@@ -2,8 +2,23 @@ export interface Recipe {
     id: string;
     title: string;
     description: string;
-    cookingTime: number;
+    preparationTime: number; // in minutes
+    cookingTime: number; // in minutes
     servings: number;
-    imageUrl?: string;
-    // Add other fields as needed
+    recipeIngredients: RecipeIngredient[];
+    imageUrl?: string | undefined;
+}
+
+export interface Ingredient {
+    id: string;
+    name: string;
+    recipeIngredients: RecipeIngredient[];
+}
+
+export interface RecipeIngredient {
+    id: string;
+    recipe: Recipe;
+    ingredient: Ingredient;
+    quantity: number;
+    units: string | null; // e.g., "grams", "cups", "tablespoons"
 }

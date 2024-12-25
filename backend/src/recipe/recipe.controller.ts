@@ -20,6 +20,7 @@ export class RecipeController {
 
     @Get('all')
     async findAll(): Promise<Recipe[]> {
+        console.log('Getting all recipes');
         return await this.recipeService.findAll();
     }
 }
