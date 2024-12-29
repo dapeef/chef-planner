@@ -137,11 +137,23 @@ const RecipeForm = () => {
 
     const addNewIngredientToList = () => {
         if (newIngredient && !availableIngredients.includes(newIngredient)) {
-            availableIngredients.push(newIngredient);
+            // First update the available ingredients
+            setAvailableIngredients(prev => [...prev, newIngredient]);
+
+            // Use setTimeout to ensure the dropdown has updated
+            setTimeout(() => {
+                setCurrentIngredient({
+                    ...currentIngredient,
+                    ingredient: {
+                        name: newIngredient,
+                    },
+                });
+            }, 0);
+
+            // Clear the input
             setNewIngredient('');
         }
     };
-
     return (
         <Card className="w-full max-w-2xl mx-auto mt-16">
             <CardHeader>

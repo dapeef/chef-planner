@@ -52,6 +52,13 @@ export class Unit {
 
 
 export const STANDARD_UNITS: Unit[] = [
+    // Unitless
+    {
+        name: 'unitless',
+        dimension: new Dimension({}),
+        siFactor: 1,
+    },
+
     // Mass
     {
         name: 'g',
