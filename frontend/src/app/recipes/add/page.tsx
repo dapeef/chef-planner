@@ -153,15 +153,21 @@ const RecipeForm = () => {
                         <FormField
                             control={form.control}
                             name="title"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Title</FormLabel>
+                            render={({field}) => {
+                                const isTouched = form.formState.touchedFields.title;
+
+                                return (<FormItem>
+                                    <FormLabel>Title *</FormLabel>
                                     <FormControl>
-                                        <Input required {...field} placeholder="Recipe title"/>
+                                        <Input
+                                            required
+                                            {...field}
+                                            className={`${isTouched && !field.value ? 'border-red-500' : ''}`}
+                                            placeholder="Recipe title"/>
                                     </FormControl>
                                     <FormMessage/>
-                                </FormItem>
-                            )}
+                                </FormItem>);
+                            }}
                         />
 
                         <FormField
@@ -182,78 +188,90 @@ const RecipeForm = () => {
                             <FormField
                                 control={form.control}
                                 name="preparationTime"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Prep Time (mins)</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="number"
-                                                min="0"
-                                                {...field}
-                                                onChange={(e) => field.onChange(parseInt(e.target.value))}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
+                                render={({field}) => {
+                                    const [isEmpty, setIsEmpty] = React.useState(false);
+
+                                    return (
+                                        <FormItem>
+                                            <FormLabel>Preparation time (mins)</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    min="0"
+                                                    value={isEmpty ? '' : field.value}
+                                                    className={`${field.value < 0 ? 'border-red-500' : ''}`}
+                                                    onChange={(e) => {
+                                                        const newValue = e.target.value;
+                                                        setIsEmpty(newValue === '');
+                                                        field.onChange(newValue === '' ? 0 : parseInt(newValue));
+                                                    }}
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    );
+                                }}
                             />
 
                             <FormField
                                 control={form.control}
                                 name="cookingTime"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Cook Time (mins)</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="number"
-                                                min="0"
-                                                {...field}
-                                                onChange={(e) => field.onChange(parseInt(e.target.value))}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
+                                render={({field}) => {
+                                    const [isEmpty, setIsEmpty] = React.useState(false);
+
+                                    return (
+                                        <FormItem>
+                                            <FormLabel>Cooking time (mins)</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    min="0"
+                                                    value={isEmpty ? '' : field.value}
+                                                    className={`${field.value < 0 ? 'border-red-500' : ''}`}
+                                                    onChange={(e) => {
+                                                        const newValue = e.target.value;
+                                                        setIsEmpty(newValue === '');
+                                                        field.onChange(newValue === '' ? 0 : parseInt(newValue));
+                                                    }}
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    );
+                                }}
                             />
 
                             <FormField
                                 control={form.control}
                                 name="servings"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Servings</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="number"
-                                                min="1"
-                                                {...field}
-                                                onChange={(e) => field.onChange(parseInt(e.target.value))}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
+                                render={({field}) => {
+                                    const [isEmpty, setIsEmpty] = React.useState(false);
+
+                                    return (
+                                        <FormItem>
+                                            <FormLabel>Servings</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    type="number"
+                                                    min="0"
+                                                    value={isEmpty ? '' : field.value}
+                                                    className={`${field.value <= 0 ? 'border-red-500' : ''}`}
+                                                    onChange={(e) => {
+                                                        const newValue = e.target.value;
+                                                        setIsEmpty(newValue === '');
+                                                        field.onChange(newValue === '' ? 0 : parseInt(newValue));
+                                                    }}
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    );
+                                }}
                             />
                         </div>
 
                         <div className="space-y-4">
                             <FormLabel>Ingredients</FormLabel>
-
-                            <div className="flex gap-2 mb-4">
-                                <Input
-                                    placeholder="Add new ingredient"
-                                    value={newIngredient}
-                                    onChange={(e) => setNewIngredient(e.target.value)}
-                                />
-                                <Button
-                                    type="button"
-                                    onClick={addNewIngredientToList}
-                                    variant="outline"
-                                >
-                                    <Plus className="w-4 h-4"/>
-                                </Button>
-                            </div>
 
                             <div className="flex gap-2 items-end">
                                 <Select
@@ -282,7 +300,7 @@ const RecipeForm = () => {
                                 <Input
                                     type="number"
                                     min="0"
-                                    className="w-24"
+                                    className="w-100%"
                                     placeholder="Qty"
                                     value={currentIngredient.quantity || ''}
                                     onChange={(e) =>
@@ -299,7 +317,7 @@ const RecipeForm = () => {
                                         setCurrentIngredient({...currentIngredient, units: value})
                                     }
                                 >
-                                    <SelectTrigger className="w-[100px]">
+                                    <SelectTrigger className="w-[150px]">
                                         <SelectValue placeholder="Select unit"/>
                                     </SelectTrigger>
                                     <SelectContent>
@@ -314,6 +332,21 @@ const RecipeForm = () => {
                                 <Button
                                     type="button"
                                     onClick={addIngredient}
+                                    variant="outline"
+                                >
+                                    <Plus className="w-4 h-4"/>
+                                </Button>
+                            </div>
+
+                            <div className="flex gap-2 mb-4">
+                                <Input
+                                    placeholder="Brand new ingredient name"
+                                    value={newIngredient}
+                                    onChange={(e) => setNewIngredient(e.target.value)}
+                                />
+                                <Button
+                                    type="button"
+                                    onClick={addNewIngredientToList}
                                     variant="outline"
                                 >
                                     <Plus className="w-4 h-4"/>
@@ -345,7 +378,13 @@ const RecipeForm = () => {
                         <Button
                             type="submit"
                             className="w-full"
-                            disabled={!form.getValues('title') || isSubmitting}
+                            disabled={
+                                !form.getValues('title') ||
+                                form.getValues('preparationTime') < 0 ||
+                                form.getValues('cookingTime') < 0 ||
+                                form.getValues('servings') <= 0 ||
+                                isSubmitting
+                            }
                         >
                             {isSubmitting ? 'Creating...' : 'Create Recipe'}
                         </Button>
