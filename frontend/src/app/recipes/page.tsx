@@ -1,6 +1,7 @@
 import RecipeGrid from '@/components/RecipeGrid';
 import { getAllRecipes } from '@/lib/db';
 
+
 export default async function RecipesPage() {
     const recipes = await getAllRecipes();
 

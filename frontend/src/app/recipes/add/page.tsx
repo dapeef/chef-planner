@@ -155,7 +155,7 @@ const RecipeForm = () => {
         }
     };
     return (
-        <Card className="w-full max-w-2xl mx-auto mt-16">
+        <Card className="w-full max-w-2xl mx-auto mt-16 mb-16">
             <CardHeader>
                 <CardTitle>Create New Recipe</CardTitle>
             </CardHeader>
