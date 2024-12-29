@@ -14,6 +14,7 @@ export class IngredientService {
     // Create a new ingredient
     async create(ingredientData: Partial<Ingredient>): Promise<Ingredient> {
         try {
+            ingredientData.name = IngredientService.capitalizeFirstLetter(ingredientData.name);
             const ingredient = this.ingredientRepository.create(ingredientData);
             return await this.ingredientRepository.save(ingredient);
         } catch (error) {
@@ -43,6 +44,15 @@ export class IngredientService {
     }
 
     async findByName(name: string): Promise<Ingredient> {
+        name = IngredientService.capitalizeFirstLetter(name);
         return await this.ingredientRepository.findOneBy({name: name});
+    }
+
+    static capitalizeFirstLetter(input: string): string {
+        if (!input) {
+            return '';
+        } // Handle empty strings or null input
+
+        return input.charAt(0).toUpperCase() + input.slice(1).toLowerCase();
     }
 }

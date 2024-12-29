@@ -1,8 +1,8 @@
 import RecipeGrid from '@/components/RecipeGrid';
-import { getRecipes } from '@/lib/db';
+import { getAllRecipes } from '@/lib/db';
 
 export default async function RecipesPage() {
-    const recipes = await getRecipes();
+    const recipes = await getAllRecipes();
 
     return (
         <div className="container mx-auto px-4 py-8">

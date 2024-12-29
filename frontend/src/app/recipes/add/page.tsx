@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from '@/hooks/use-toast';
@@ -32,20 +32,8 @@ import {
     Recipe,
     RecipeIngredient,
 } from '@/lib/types';
-import { createRecipe } from '@/lib/db';
+import { createRecipe, getAllIngredientStrings } from '@/lib/db';
 
-
-// Predefined lists
-const PREDEFINED_INGREDIENTS = [
-    'Salt',
-    'Pepper',
-    'Olive Oil',
-    'Garlic',
-    'Onion',
-    'Flour',
-    'Sugar',
-    'Butter',
-];
 
 const QUANTITY_UNITS = [
     'g',
@@ -71,6 +59,12 @@ const RecipeForm = () => {
         },
     });
 
+    const [availableIngredients, setAvailableIngredients] = useState<string[]>([]);
+
+    useEffect(() => {
+        fetchAvailableIngredients();
+    }, []); // Empty dependency array ensures it runs only once when the component mounts.
+
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [newIngredient, setNewIngredient] = useState('');
     const [currentIngredient, setCurrentIngredient] = useState<
@@ -83,6 +77,15 @@ const RecipeForm = () => {
     });
     const [recipeIngredients, setRecipeIngredients] = useState<
         RecipeIngredient[]>([]);
+
+    const fetchAvailableIngredients = async () => {
+        try {
+            const ingredients = await getAllIngredientStrings();
+            setAvailableIngredients(ingredients);
+        } catch (error) {
+            console.error('Error fetching ingredients:', error);
+        }
+    };
 
     const onSubmit = async (data: Recipe) => {
         try {
@@ -114,6 +117,8 @@ const RecipeForm = () => {
             });
         } finally {
             setIsSubmitting(false);
+
+            fetchAvailableIngredients();
         }
     };
 
@@ -136,8 +141,8 @@ const RecipeForm = () => {
     };
 
     const addNewIngredientToList = () => {
-        if (newIngredient && !PREDEFINED_INGREDIENTS.includes(newIngredient)) {
-            PREDEFINED_INGREDIENTS.push(newIngredient);
+        if (newIngredient && !availableIngredients.includes(newIngredient)) {
+            availableIngredients.push(newIngredient);
             setNewIngredient('');
         }
     };
@@ -289,7 +294,7 @@ const RecipeForm = () => {
                                         <SelectValue placeholder="Select ingredient"/>
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {PREDEFINED_INGREDIENTS.map((ing) => (
+                                        {availableIngredients.map((ing) => (
                                             <SelectItem key={ing} value={ing}>
                                                 {ing}
                                             </SelectItem>

@@ -1,7 +1,7 @@
 // src/lib/db.ts
-import type { Recipe } from './types';
+import type { Ingredient, Recipe } from './types';
 
-export async function getRecipes(): Promise<Recipe[]> {
+export async function getAllRecipes(): Promise<Recipe[]> {
     const apiUrl = 'http://localhost:3000/recipe/all';
 
     const response = await fetch(apiUrl, {
@@ -9,12 +9,7 @@ export async function getRecipes(): Promise<Recipe[]> {
         headers: {
             'Content-Type': 'application/json',
         },
-        // body: JSON.stringify({
-        //     id: '1234', // Replace with your dynamic value if needed
-        // }),
     });
-
-    console.log(response);
 
     if (!response.ok) {
         throw new Error(`Error while getting all recipes: ${response.statusText}`);
@@ -39,4 +34,27 @@ export async function createRecipe(recipe: Recipe) {
     }
 
     return await response.json();
+}
+
+export async function getAllIngredients(): Promise<Ingredient[]> {
+    const apiUrl = 'http://localhost:3000/ingredient/all';
+
+    const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Error while getting all ingredients: ${response.statusText}`);
+    }
+
+    return await response.json();
+}
+
+export async function getAllIngredientStrings(): Promise<string[]> {
+    const ingredients = await getAllIngredients();
+
+    return ingredients.map(ingredient => ingredient.name);
 }
