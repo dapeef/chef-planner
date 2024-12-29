@@ -22,3 +22,21 @@ export async function getRecipes(): Promise<Recipe[]> {
 
     return await response.json();
 }
+
+export async function createRecipe(recipe: Recipe) {
+    const apiUrl = 'http://localhost:3000/recipe';
+
+    const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(recipe),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Error while creating recipe: ${response.statusText}`);
+    }
+
+    return await response.json();
+}

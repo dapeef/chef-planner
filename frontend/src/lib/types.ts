@@ -1,5 +1,5 @@
 export interface Recipe {
-    id: string;
+    id?: string;
     title: string;
     description: string;
     preparationTime: number; // in minutes
@@ -10,15 +10,15 @@ export interface Recipe {
 }
 
 export interface Ingredient {
-    id: string;
+    id?: string;
     name: string;
-    recipeIngredients: RecipeIngredient[];
+    recipeIngredients?: RecipeIngredient[];
 }
 
 export interface RecipeIngredient {
-    id: string;
-    recipe: Recipe;
+    id?: string;
+    recipe?: Recipe;
     ingredient: Ingredient;
     quantity: number;
-    units: string | null; // e.g., "grams", "cups", "tablespoons"
+    units: string; // e.g., "grams", "cups", "tablespoons"
 }

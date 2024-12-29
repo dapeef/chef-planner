@@ -6,10 +6,10 @@ import { Ingredient } from '../ingredient/ingredient.entity';
 @Entity('recipe_ingredients')
 export class RecipeIngredient {
     @PrimaryGeneratedColumn('uuid')
-    id: string;
+    id?: string;
 
     @ManyToOne(() => Recipe, (recipe) => recipe.recipeIngredients)
-    recipe: Recipe;
+    recipe?: Recipe;
 
     @ManyToOne(() => Ingredient, (ingredient) => ingredient.recipeIngredients)
     ingredient: Ingredient;
@@ -18,11 +18,5 @@ export class RecipeIngredient {
     quantity: number;
 
     @Column()
-    units: string | null; // e.g., "grams", "cups", "tablespoons"
-}
-
-export interface RecipeIngredientCreator {
-    ingredientId: string;
-    quantity: number;
-    units: string | null;
+    units?: string; // e.g., "grams", "cups", "tablespoons"
 }

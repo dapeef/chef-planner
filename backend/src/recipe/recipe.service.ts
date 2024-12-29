@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Recipe, RecipeCreator } from './recipe.entity';
+import { Recipe } from './recipe.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RecipeIngredientService } from '../recipe-ingredient/recipe-ingredient.service';
 
@@ -13,15 +13,15 @@ export class RecipeService {
     ) {}
 
     // Create a new recipe
-    async create(recipeData: RecipeCreator): Promise<Recipe> {
-        const partialRecipe: Partial<Recipe> = {
+    async create(recipeData: Recipe): Promise<Recipe> {
+        const partialRecipe: Recipe = {
             ...recipeData,
             recipeIngredients: [],
         };
 
-        for (const ingredientId of recipeData.recipeIngredientIds) {
+        for (const recipeIngredient of recipeData.recipeIngredients) {
             partialRecipe.recipeIngredients.push(
-                await this.recipeIngredientService.findById(ingredientId),
+                await this.recipeIngredientService.create(recipeIngredient),
             );
         }
 

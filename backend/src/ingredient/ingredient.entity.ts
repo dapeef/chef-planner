@@ -6,11 +6,11 @@ import { RecipeIngredient } from '../recipe-ingredient/recipe-ingredient.entity'
 @Unique(['name'])
 export class Ingredient {
     @PrimaryGeneratedColumn('uuid')
-    id: string;
+    id?: string;
 
     @Column()
     name: string;
 
     @OneToMany(() => RecipeIngredient, (recipeIngredient) => recipeIngredient.ingredient)
-    recipeIngredients: RecipeIngredient[];
+    recipeIngredients?: RecipeIngredient[];
 }
