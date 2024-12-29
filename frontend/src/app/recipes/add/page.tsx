@@ -143,7 +143,7 @@ const RecipeForm = () => {
     };
 
     return (
-        <Card className="w-full max-w-2xl mx-auto">
+        <Card className="w-full max-w-2xl mx-auto mt-16">
             <CardHeader>
                 <CardTitle>Create New Recipe</CardTitle>
             </CardHeader>
@@ -301,7 +301,7 @@ const RecipeForm = () => {
                                 <Input
                                     type="number"
                                     min="0"
-                                    className="w-[150px]"
+                                    className="flex-1"
                                     placeholder="Qty"
                                     value={currentIngredient.quantity || ''}
                                     onChange={(e) =>
