@@ -10,7 +10,7 @@ import { Recipe } from './recipe/recipe.entity';
 import { Ingredient } from './ingredient/ingredient.entity';
 import { RecipeIngredient } from './recipe-ingredient/recipe-ingredient.entity';
 import { UnitModule } from './unit/unit.module';
-import { Unit } from './unit/unit.entity';
+import { Dimension, Unit } from './unit/unit.entity';
 
 @Module({
     imports: [
@@ -30,7 +30,7 @@ import { Unit } from './unit/unit.entity';
                 username: configService.get<string>('DB_USERNAME'),
                 password: configService.get<string>('DB_PASSWORD'),
                 database: configService.get<string>('DB_NAME'),
-                entities: [Recipe, Ingredient, RecipeIngredient, Unit],
+                entities: [Recipe, Ingredient, RecipeIngredient, Unit, Dimension],
                 synchronize: configService.get<string>('NODE_ENV') === 'dev', // Automatically updates database schema;
                                                                               // turn off in production.
             }),
@@ -40,6 +40,7 @@ import { Unit } from './unit/unit.entity';
             Ingredient,
             RecipeIngredient,
             Unit,
+            Dimension,
         ]),
         UnitModule,
     ],

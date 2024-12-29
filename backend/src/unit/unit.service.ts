@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AlreadyExistsException } from '../exceptions/exceptions';
-import { Unit } from './unit.entity';
+import { STANDARD_UNITS, Unit } from './unit.entity';
 
 @Injectable()
 export class UnitService {
@@ -32,6 +32,16 @@ export class UnitService {
         } else {
             return existingUnit;
         }
+    }
+
+    async createFromArray(units: Unit[]) {
+        for (const unit of units) {
+            await this.softCreate(unit);
+        }
+    }
+
+    async createStandard() {
+        await this.createFromArray(STANDARD_UNITS);
     }
 
     async findAll(): Promise<Unit[]> {

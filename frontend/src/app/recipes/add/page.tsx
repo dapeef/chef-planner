@@ -297,10 +297,11 @@ const RecipeForm = () => {
                                     </SelectContent>
                                 </Select>
 
+                                {/*TODO make this go red if empty*/}
                                 <Input
                                     type="number"
                                     min="0"
-                                    className="w-100%"
+                                    className="w-[150px]"
                                     placeholder="Qty"
                                     value={currentIngredient.quantity || ''}
                                     onChange={(e) =>

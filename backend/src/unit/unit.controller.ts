@@ -13,6 +13,11 @@ export class UnitController {
         return await this.unitService.softCreate(unit);
     }
 
+    @Post('standard')
+    async createStandard() {
+        return await this.unitService.createStandard();
+    }
+
     @Get()
     async findBy(@Body('id') id?: string, @Body('name') name?: string): Promise<Unit> {
         if (id) {
