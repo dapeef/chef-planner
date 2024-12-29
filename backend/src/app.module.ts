@@ -9,6 +9,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Recipe } from './recipe/recipe.entity';
 import { Ingredient } from './ingredient/ingredient.entity';
 import { RecipeIngredient } from './recipe-ingredient/recipe-ingredient.entity';
+import { UnitModule } from './unit/unit.module';
+import { Unit } from './unit/unit.entity';
 
 @Module({
     imports: [
@@ -28,12 +30,18 @@ import { RecipeIngredient } from './recipe-ingredient/recipe-ingredient.entity';
                 username: configService.get<string>('DB_USERNAME'),
                 password: configService.get<string>('DB_PASSWORD'),
                 database: configService.get<string>('DB_NAME'),
-                entities: [Recipe, Ingredient, RecipeIngredient],
+                entities: [Recipe, Ingredient, RecipeIngredient, Unit],
                 synchronize: configService.get<string>('NODE_ENV') === 'dev', // Automatically updates database schema;
                                                                               // turn off in production.
             }),
         }),
-        TypeOrmModule.forFeature([Recipe, Ingredient, RecipeIngredient]),
+        TypeOrmModule.forFeature([
+            Recipe,
+            Ingredient,
+            RecipeIngredient,
+            Unit,
+        ]),
+        UnitModule,
     ],
     controllers: [AppController],
     providers: [AppService],

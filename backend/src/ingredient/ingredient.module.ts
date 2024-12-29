@@ -7,13 +7,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Ingredient } from './ingredient.entity';
 import { RecipeIngredient } from '../recipe-ingredient/recipe-ingredient.entity';
 import { RecipeIngredientService } from '../recipe-ingredient/recipe-ingredient.service';
+import { UnitService } from '../unit/unit.service';
+import { Unit } from '../unit/unit.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Recipe, Ingredient, RecipeIngredient])],
+    imports: [TypeOrmModule.forFeature([Recipe, Ingredient, RecipeIngredient, Unit])],
     providers: [
         RecipeService,
         IngredientService,
         RecipeIngredientService,
+        UnitService,
     ],
     controllers: [IngredientController],
 })

@@ -32,20 +32,7 @@ import {
     Recipe,
     RecipeIngredient,
 } from '@/lib/types';
-import { createRecipe, getAllIngredientStrings } from '@/lib/db';
-
-
-const QUANTITY_UNITS = [
-    'g',
-    'kg',
-    'ml',
-    'l',
-    'tsp',
-    'tbsp',
-    'cup',
-    'piece',
-    'pinch',
-];
+import { createRecipe, getAllIngredientStrings, getAllUnitStrings } from '@/lib/db';
 
 const RecipeForm = () => {
     const form = useForm<Recipe>({
@@ -60,9 +47,10 @@ const RecipeForm = () => {
     });
 
     const [availableIngredients, setAvailableIngredients] = useState<string[]>([]);
+    const [availableUnits, setAvailableUnits] = useState<string[]>([]);
 
     useEffect(() => {
-        fetchAvailableIngredients();
+        fetchAvailableIngredientsAndUnits();
     }, []); // Empty dependency array ensures it runs only once when the component mounts.
 
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -73,15 +61,20 @@ const RecipeForm = () => {
             name: '',
         },
         quantity: 0,
-        units: '',
+        unit: {
+            name: '',
+        },
     });
     const [recipeIngredients, setRecipeIngredients] = useState<
         RecipeIngredient[]>([]);
 
-    const fetchAvailableIngredients = async () => {
+    const fetchAvailableIngredientsAndUnits = async () => {
         try {
             const ingredients = await getAllIngredientStrings();
             setAvailableIngredients(ingredients);
+
+            const units = await getAllUnitStrings();
+            setAvailableUnits(units);
         } catch (error) {
             console.error('Error fetching ingredients:', error);
         }
@@ -118,19 +111,21 @@ const RecipeForm = () => {
         } finally {
             setIsSubmitting(false);
 
-            fetchAvailableIngredients();
+            fetchAvailableIngredientsAndUnits();
         }
     };
 
     const addIngredient = () => {
-        if (currentIngredient.ingredient.name && currentIngredient.quantity && currentIngredient.units) {
+        if (currentIngredient.ingredient.name && currentIngredient.quantity && currentIngredient.unit) {
             setRecipeIngredients([...recipeIngredients, currentIngredient]);
             setCurrentIngredient({
                 ingredient: {
                     name: '',
                 },
                 quantity: 0,
-                units: '',
+                unit: {
+                    name: '',
+                },
             });
         }
     };
@@ -317,16 +312,16 @@ const RecipeForm = () => {
                                 />
 
                                 <Select
-                                    value={currentIngredient.units}
+                                    value={currentIngredient.unit.name}
                                     onValueChange={(value) =>
-                                        setCurrentIngredient({...currentIngredient, units: value})
+                                        setCurrentIngredient({...currentIngredient, unit: {name: value}})
                                     }
                                 >
                                     <SelectTrigger className="w-[150px]">
                                         <SelectValue placeholder="Select unit"/>
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {QUANTITY_UNITS.map((unit) => (
+                                        {availableUnits.map((unit) => (
                                             <SelectItem key={unit} value={unit}>
                                                 {unit}
                                             </SelectItem>
@@ -365,7 +360,7 @@ const RecipeForm = () => {
                                         className="flex items-center justify-between p-2 border rounded"
                                     >
                     <span>
-                      {ing.quantity} {ing.units} {ing.ingredient.name}
+                      {ing.quantity} {ing.unit.name} {ing.ingredient.name}
                     </span>
                                         <Button
                                             type="button"

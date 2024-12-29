@@ -7,17 +7,21 @@ import { RecipeIngredientService } from '../recipe-ingredient/recipe-ingredient.
 import { RecipeIngredient } from '../recipe-ingredient/recipe-ingredient.entity';
 import { Ingredient } from '../ingredient/ingredient.entity';
 import { IngredientService } from '../ingredient/ingredient.service';
+import { UnitService } from '../unit/unit.service';
+import { Unit } from '../unit/unit.entity';
 
 @Module({
     imports: [TypeOrmModule.forFeature([
         Recipe,
         RecipeIngredient,
         Ingredient,
+        Unit,
     ])],
     providers: [
         RecipeService,
         RecipeIngredientService,
         IngredientService,
+        UnitService,
     ],
     controllers: [RecipeController],
 })

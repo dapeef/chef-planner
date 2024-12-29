@@ -20,5 +20,11 @@ export interface RecipeIngredient {
     recipe?: Recipe;
     ingredient: Ingredient;
     quantity: number;
-    units: string; // e.g., "grams", "cups", "tablespoons"
+    unit: Unit;
+}
+
+export interface Unit {
+    id?: string;
+    name: string;
+    recipeIngredients?: RecipeIngredient[];
 }
