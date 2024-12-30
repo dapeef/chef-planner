@@ -20,56 +20,64 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Calendar } from '@/components/ui/calendar';
+import { DateRange } from 'react-day-picker';
+import { addDays } from 'date-fns';
 
 // Define types for the form data
 interface DayConfig {
+    date: Date;
     lunchMeals: number;
     dinnerMeals: number;
     prepTime: number;
 }
 
 interface MealPlanForm {
-    endDate: Date | null;
+    dateRange: DateRange | undefined;
     dailyConfigs: DayConfig[];
 }
 
 const MealPlanForm: React.FC = () => {
     const form = useForm<MealPlanForm>({
         defaultValues: {
-            endDate: null,
+            dateRange: undefined,
             dailyConfigs: [],
         },
     });
 
     const [days, setDays] = useState<number>(0);
 
+    const [dateRange, setDateRange] = React.useState<DateRange | undefined>(undefined);
+
     // Handle date change
-    const handleDateChange = (date: Date | undefined) => {
-        if (!date) {
+    const handleDateChange = (dateRange: DateRange | undefined) => {
+        // Check that the date range isn't undefined
+        if (!dateRange || !dateRange.to || !dateRange.from) {
             return;
         }
 
-        form.setValue('endDate', date);
+        form.setValue('dateRange', dateRange);
 
-        const currentDate = new Date();
-        const timeDifference = date.getTime() - currentDate.getTime();
+        const timeDifference = dateRange.to.getTime() - dateRange.from.getTime();
         const calculatedDays = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
         setDays(calculatedDays);
 
         // Initialize dailyConfigs with default values
-        form.setValue(
-            'dailyConfigs',
-            Array.from({length: calculatedDays}, () => ({
-                lunchMeals: 0,
-                dinnerMeals: 0,
-                prepTime: 0,
-            })),
-        );
+        const config: DayConfig[] = [];
+        for (let i = 0; i < calculatedDays + 1; i++) {
+            config.push({
+                date: addDays(dateRange.from, i),
+                lunchMeals: 2,
+                dinnerMeals: 2,
+                prepTime: 45,
+            });
+        }
+
+        form.setValue('dailyConfigs', config);
     };
 
     // Form submission
     const onSubmit: SubmitHandler<MealPlanForm> = (data) => {
-        if (!data.endDate) {
+        if (!data.dateRange || !data.dateRange.to || !data.dateRange.from) {
             toast({
                 title: 'Error',
                 description: 'Please select an end date.',
@@ -97,17 +105,17 @@ const MealPlanForm: React.FC = () => {
                             {/* End Date Picker */}
                             <FormField
                                 control={form.control}
-                                name="endDate"
+                                name="dateRange"
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>Select End Date</FormLabel>
                                         <FormControl>
-                                            {/*TODO turn this into a single, range select*/}
                                             {/*TODO only allow future (or current) dates to be selected*/}
                                             <Calendar
-                                                mode="single"
-                                                selected={field.value ? new Date(field.value) : undefined} // Convert to Date if not null
-                                                onSelect={(date: Date | undefined) => {
+                                                mode="range"
+                                                selected={dateRange}
+                                                onSelect={(date: DateRange | undefined) => {
+                                                    setDateRange(date);
                                                     handleDateChange(date); // Pass null if date is undefined
                                                     field.onChange(date || null); // Update form state
                                                 }}
@@ -126,10 +134,6 @@ const MealPlanForm: React.FC = () => {
                                 >
                                     <h3 className="font-semibold">
                                         {(() => {
-                                            // Calculate the date corresponding to today + index days
-                                            const today = new Date();
-                                            today.setDate(today.getDate() + index + 1); // Add the index to today (in days)
-
                                             // Format the date to show the day of the week, day of the month, and month
                                             const options: Intl.DateTimeFormatOptions = {
                                                 weekday: 'long', // Day of the week (e.g., "Monday")
@@ -137,7 +141,9 @@ const MealPlanForm: React.FC = () => {
                                                 month: 'short',   // Full month name (e.g., "January")
                                             };
 
-                                            return today.toLocaleDateString('en-UK', options);
+                                            const date = form.getValues('dailyConfigs')[index].date;
+
+                                            return date.toLocaleDateString('en-UK', options);
                                         })()}
                                     </h3>
 
@@ -206,7 +212,11 @@ const MealPlanForm: React.FC = () => {
                             <Button
                                 type="submit"
                                 className="w-full"
-                                disabled={!form.getValues('endDate')}
+                                disabled={
+                                    !form.getValues('dateRange') ||
+                                    !form.getValues('dateRange')?.from ||
+                                    !form.getValues('dateRange')?.to
+                                }
                             >
                                 Create Meal Plan
                             </Button>
