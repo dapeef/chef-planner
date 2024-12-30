@@ -22,6 +22,8 @@ import {
 import { Calendar } from '@/components/ui/calendar';
 import { DateRange } from 'react-day-picker';
 import { addDays } from 'date-fns';
+import AddIngredient from '@/components/AddIngredient';
+import { RecipeIngredient } from '@/lib/types';
 
 // Define types for the form data
 interface DayConfig {
@@ -45,6 +47,7 @@ const MealPlanForm: React.FC = () => {
     });
 
     const [dateRange, setDateRange] = React.useState<DateRange | undefined>(undefined);
+    const [recipeIngredients, setRecipeIngredients] = React.useState<RecipeIngredient[]>([]);
 
     // Handle date change
     const handleDateChange = (dateRange: DateRange | undefined) => {
@@ -122,6 +125,15 @@ const MealPlanForm: React.FC = () => {
                                                 <FormMessage/>
                                             </FormItem>
                                         )}
+                                    />
+                                </div>
+
+                                {/* Add ingredients */}
+                                <div className="p-4 border rounded space-y-4">
+                                    <AddIngredient
+                                        recipeIngredients={recipeIngredients}
+                                        setRecipeIngredients={setRecipeIngredients}
+                                        allowNewIngredients={false}
                                     />
                                 </div>
                             </div>
