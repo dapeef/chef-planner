@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { toast } from '@/hooks/use-toast';
 import {
@@ -44,8 +44,6 @@ const MealPlanForm: React.FC = () => {
         },
     });
 
-    const [days, setDays] = useState<number>(0);
-
     const [dateRange, setDateRange] = React.useState<DateRange | undefined>(undefined);
 
     // Handle date change
@@ -59,7 +57,6 @@ const MealPlanForm: React.FC = () => {
 
         const timeDifference = dateRange.to.getTime() - dateRange.from.getTime();
         const calculatedDays = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
-        setDays(calculatedDays);
 
         // Initialize dailyConfigs with default values
         const config: DayConfig[] = [];
@@ -80,7 +77,7 @@ const MealPlanForm: React.FC = () => {
         if (!data.dateRange || !data.dateRange.to || !data.dateRange.from) {
             toast({
                 title: 'Error',
-                description: 'Please select an end date.',
+                description: 'Please select the date range date.',
                 variant: 'destructive',
             });
             return;
@@ -102,29 +99,32 @@ const MealPlanForm: React.FC = () => {
                 <CardContent>
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                            {/* End Date Picker */}
-                            <FormField
-                                control={form.control}
-                                name="dateRange"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Select End Date</FormLabel>
-                                        <FormControl>
-                                            {/*TODO only allow future (or current) dates to be selected*/}
-                                            <Calendar
-                                                mode="range"
-                                                selected={dateRange}
-                                                onSelect={(date: DateRange | undefined) => {
-                                                    setDateRange(date);
-                                                    handleDateChange(date); // Pass null if date is undefined
-                                                    field.onChange(date || null); // Update form state
-                                                }}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
+                            <div className="grid grid-cols-1 gap-4 xs:grid-cols-1 md:grid-cols-2">
+                                {/* End Date Picker */}
+                                <div className="p-4 border rounded space-y-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="dateRange"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Select Date Range</FormLabel>
+                                                <FormControl>
+                                                    <Calendar
+                                                        mode="range"
+                                                        selected={dateRange}
+                                                        onSelect={(date: DateRange | undefined) => {
+                                                            setDateRange(date);
+                                                            handleDateChange(date); // Pass null if date is undefined
+                                                            field.onChange(date || null); // Update form state
+                                                        }}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            </div>
 
                             {/* Daily Configurations */}
                             {form.watch('dailyConfigs').map((_, index) => (

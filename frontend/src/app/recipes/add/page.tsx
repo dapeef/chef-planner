@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { Plus, X } from 'lucide-react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from '@/hooks/use-toast';
 import {
@@ -10,13 +9,6 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -32,7 +24,8 @@ import {
     Recipe,
     RecipeIngredient,
 } from '@/lib/types';
-import { createRecipe, getAllIngredientStrings, getAllUnitStrings } from '@/lib/db';
+import { createRecipe } from '@/lib/db';
+import AddIngredient from '@/components/AddIngredient';
 
 const RecipeForm = () => {
     const form = useForm<Recipe>({
@@ -46,39 +39,8 @@ const RecipeForm = () => {
         },
     });
 
-    const [availableIngredients, setAvailableIngredients] = useState<string[]>([]);
-    const [availableUnits, setAvailableUnits] = useState<string[]>([]);
-
-    useEffect(() => {
-        fetchAvailableIngredientsAndUnits();
-    }, []); // Empty dependency array ensures it runs only once when the component mounts.
-
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [newIngredient, setNewIngredient] = useState('');
-    const [currentIngredient, setCurrentIngredient] = useState<
-        RecipeIngredient>({
-        ingredient: {
-            name: '',
-        },
-        quantity: 0,
-        unit: {
-            name: '',
-        },
-    });
-    const [recipeIngredients, setRecipeIngredients] = useState<
-        RecipeIngredient[]>([]);
-
-    const fetchAvailableIngredientsAndUnits = async () => {
-        try {
-            const ingredients = await getAllIngredientStrings();
-            setAvailableIngredients(ingredients);
-
-            const units = await getAllUnitStrings();
-            setAvailableUnits(units);
-        } catch (error) {
-            console.error('Error fetching ingredients:', error);
-        }
-    };
+    const [recipeIngredients, setRecipeIngredients] = useState<RecipeIngredient[]>([]);
 
     const onSubmit = async (data: Recipe) => {
         try {
@@ -110,50 +72,9 @@ const RecipeForm = () => {
             });
         } finally {
             setIsSubmitting(false);
-
-            fetchAvailableIngredientsAndUnits();
         }
     };
 
-    const addIngredient = () => {
-        if (currentIngredient.ingredient.name && currentIngredient.quantity && currentIngredient.unit) {
-            setRecipeIngredients([...recipeIngredients, currentIngredient]);
-            setCurrentIngredient({
-                ingredient: {
-                    name: '',
-                },
-                quantity: 0,
-                unit: {
-                    name: '',
-                },
-            });
-        }
-    };
-
-    const removeIngredient = (index: number) => {
-        const newIngredients = recipeIngredients.filter((_, i) => i !== index);
-        setRecipeIngredients(newIngredients);
-    };
-
-    const addNewIngredientToList = () => {
-        if (newIngredient && !availableIngredients.includes(newIngredient)) {
-            // First update the available ingredients
-            setAvailableIngredients(prev => [...prev, newIngredient]);
-
-            // Use setTimeout to ensure the dropdown has updated
-            setTimeout(() => {
-                setCurrentIngredient({
-                    ...currentIngredient,
-                    ingredient: {
-                        name: newIngredient,
-                    },
-                });
-            }, 0);
-
-            // Clear the input
-            setNewIngredient('');
-        }
-    };
     return (
         <Card className="w-full max-w-2xl mx-auto mt-16 mb-16">
             <CardHeader>
@@ -282,111 +203,11 @@ const RecipeForm = () => {
                             />
                         </div>
 
-                        <div className="space-y-4">
-                            <FormLabel>Ingredients</FormLabel>
-
-                            <div className="flex gap-2 items-end">
-                                <Select
-                                    value={currentIngredient.ingredient.name}
-                                    onValueChange={(value) =>
-                                        setCurrentIngredient({
-                                            ...currentIngredient,
-                                            ingredient: {
-                                                name: value,
-                                            },
-                                        })
-                                    }
-                                >
-                                    <SelectTrigger className="w-[180px]">
-                                        <SelectValue placeholder="Select ingredient"/>
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {availableIngredients.map((ing) => (
-                                            <SelectItem key={ing} value={ing}>
-                                                {ing}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-
-                                {/*TODO make this go red if empty*/}
-                                <Input
-                                    type="number"
-                                    min="0"
-                                    className="flex-1"
-                                    placeholder="Qty"
-                                    value={currentIngredient.quantity || ''}
-                                    onChange={(e) =>
-                                        setCurrentIngredient({
-                                            ...currentIngredient,
-                                            quantity: parseFloat(e.target.value),
-                                        })
-                                    }
-                                />
-
-                                <Select
-                                    value={currentIngredient.unit.name}
-                                    onValueChange={(value) =>
-                                        setCurrentIngredient({...currentIngredient, unit: {name: value}})
-                                    }
-                                >
-                                    <SelectTrigger className="w-[150px]">
-                                        <SelectValue placeholder="Select unit"/>
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {availableUnits.map((unit) => (
-                                            <SelectItem key={unit} value={unit}>
-                                                {unit}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-
-                                <Button
-                                    type="button"
-                                    onClick={addIngredient}
-                                    variant="outline"
-                                >
-                                    <Plus className="w-4 h-4"/>
-                                </Button>
-                            </div>
-
-                            <div className="flex gap-2 mb-4">
-                                <Input
-                                    placeholder="Brand new ingredient name"
-                                    value={newIngredient}
-                                    onChange={(e) => setNewIngredient(e.target.value)}
-                                />
-                                <Button
-                                    type="button"
-                                    onClick={addNewIngredientToList}
-                                    variant="outline"
-                                >
-                                    <Plus className="w-4 h-4"/>
-                                </Button>
-                            </div>
-
-                            <div className="space-y-2">
-                                {recipeIngredients.map((ing, index) => (
-                                    <div
-                                        key={index}
-                                        className="flex items-center justify-between p-2 border rounded"
-                                    >
-                    <span>
-                      {ing.quantity} {ing.unit.name} {ing.ingredient.name}
-                    </span>
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => removeIngredient(index)}
-                                        >
-                                            <X className="w-4 h-4"/>
-                                        </Button>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                        <AddIngredient
+                            recipeIngredients={recipeIngredients}
+                            setRecipeIngredients={setRecipeIngredients}
+                            allowNewIngredients={true}
+                        />
 
                         <Button
                             type="submit"

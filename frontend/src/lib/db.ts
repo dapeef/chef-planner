@@ -1,5 +1,7 @@
 // src/lib/db.ts
 import type { Ingredient, Recipe, Unit } from './types';
+import React from 'react';
+import { toast } from '@/hooks/use-toast';
 
 export async function getAllRecipes(): Promise<Recipe[]> {
     const apiUrl = 'http://localhost:3000/recipe/all';
@@ -80,4 +82,24 @@ export async function getAllUnitStrings(): Promise<string[]> {
     const units = await getAllUnits();
 
     return units.map(unit => unit.name);
+}
+
+export async function fetchIngredientStrings(
+    setAvailableIngredients: (value: React.SetStateAction<string[]>) => void,
+    setAvailableUnits: (value: React.SetStateAction<string[]>) => void,
+) {
+    try {
+        const ingredients = await getAllIngredientStrings();
+        setAvailableIngredients(ingredients);
+
+        const units = await getAllUnitStrings();
+        setAvailableUnits(units);
+    } catch (error) {
+        console.error('Error fetching ingredients:', error);
+        toast({
+            title: 'Error',
+            description: 'Failed to fetch ingredients. Please check your internet connection.',
+            variant: 'destructive',
+        });
+    }
 }
