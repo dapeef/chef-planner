@@ -1,11 +1,40 @@
-import { FormLabel } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import React, { useEffect, useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Plus, X } from 'lucide-react';
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+} from '@/components/ui/form';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Plus, X } from 'lucide-react';
-import React, { useEffect, useRef, useState } from 'react';
-import { RecipeIngredient } from '@/lib/types';
 import { fetchIngredientStrings } from '@/lib/db';
+import { RecipeIngredient } from '@/lib/types';
+import ValidatedNumberInput from '@/components/ValidatedNumberInput';
+
+// Define the form schema
+const addIngredientSchema = z.object({
+    ingredient: z.object({
+        name: z.string().min(1, 'Ingredient is required'),
+    }),
+    quantity: z.number().min(0.01, 'Quantity must be greater than 0'),
+    unit: z.object({
+        name: z.string().min(1, 'Unit is required'),
+    }),
+});
+
+type AddIngredientFormValues = z.infer<typeof addIngredientSchema>;
 
 interface AddIngredientProps {
     formName?: string;
@@ -20,38 +49,26 @@ const AddIngredient = ({
                            setRecipeIngredients,
                            allowNewIngredients = true,
                        }: AddIngredientProps) => {
-
-    const [newIngredient, setNewIngredient] = useState('');
-    const [currentIngredient, setCurrentIngredient] = useState<
-        RecipeIngredient>({
-        ingredient: {
-            name: '',
-        },
-        quantity: 0,
-        unit: {
-            name: '',
-        },
-    });
-
     const [availableIngredients, setAvailableIngredients] = useState<string[]>([]);
     const [availableUnits, setAvailableUnits] = useState<string[]>([]);
+    const [newIngredient, setNewIngredient] = useState('');
 
     const containerRef = useRef<HTMLDivElement>(null);
     const [isNarrow, setIsNarrow] = useState(false);
 
-    const addIngredient = () => {
-        if (currentIngredient.ingredient.name && currentIngredient.quantity && currentIngredient.unit.name) {
-            setRecipeIngredients([...recipeIngredients, currentIngredient]);
-            setCurrentIngredient({
-                ingredient: {
-                    name: '',
-                },
-                quantity: 0,
-                unit: {
-                    name: '',
-                },
-            });
-        }
+    // Initialize the form
+    const form = useForm<AddIngredientFormValues>({
+        resolver: zodResolver(addIngredientSchema),
+        defaultValues: {
+            ingredient: {name: ''},
+            quantity: 0,
+            unit: {name: ''},
+        },
+    });
+
+    const addIngredient = (values: AddIngredientFormValues) => {
+        setRecipeIngredients([...recipeIngredients, values]);
+        form.reset();
     };
 
     const removeIngredient = (index: number) => {
@@ -60,31 +77,22 @@ const AddIngredient = ({
     };
 
     const addNewIngredientToList = () => {
-        if (newIngredient &&
+        if (
+            newIngredient &&
             !availableIngredients.includes(newIngredient) &&
-            setAvailableIngredients &&
             allowNewIngredients
         ) {
-            // First update the available ingredients
-            setAvailableIngredients(prev => [...prev, newIngredient]);
+            setAvailableIngredients((prev) => [...prev, newIngredient]);
 
-            // Use setTimeout to ensure the dropdown has updated
             setTimeout(() => {
-                setCurrentIngredient({
-                    ...currentIngredient,
-                    ingredient: {
-                        name: newIngredient,
-                    },
-                });
+                form.setValue('ingredient.name', newIngredient);
             }, 0);
 
-            // Clear the input
             setNewIngredient('');
         }
     };
 
     const createWidthUpdater = () => {
-        // Update based on container size
         if (!containerRef.current) {
             return;
         }
@@ -97,16 +105,10 @@ const AddIngredient = ({
             setIsNarrow(containerWidth < 500);
         };
 
-        // Check initial size
         checkSize();
-
-        // Create ResizeObserver instance
         const observer = new ResizeObserver(checkSize);
-
-        // Start observing the container
         observer.observe(containerRef.current);
 
-        // Cleanup
         return () => {
             if (containerRef.current) {
                 observer.unobserve(containerRef.current);
@@ -116,85 +118,89 @@ const AddIngredient = ({
 
     useEffect(() => {
         fetchIngredientStrings(setAvailableIngredients, setAvailableUnits);
-
         createWidthUpdater();
-    }, []); // Empty dependency array ensures it runs only once when the component mounts.
+    }, []);
 
     return (
         <div className="space-y-4" ref={containerRef}>
             <FormLabel>{formName}</FormLabel>
 
-            <div className={`flex gap-2 ${isNarrow ? 'flex-col' : 'items-end'}`}>
-                <div className={`flex gap-2 ${isNarrow ? 'w-full' : ''}`}>
-                    <Select
-                        value={currentIngredient.ingredient.name}
-                        onValueChange={(value) =>
-                            setCurrentIngredient({
-                                ...currentIngredient,
-                                ingredient: {name: value},
-                            })
-                        }
-                    >
-                        <SelectTrigger className={isNarrow ? 'w-full' : 'w-[180px]'}>
-                            <SelectValue placeholder="Select ingredient"/>
-                        </SelectTrigger>
-                        <SelectContent>
-                            {availableIngredients.map((ing) => (
-                                <SelectItem key={ing} value={ing}>
-                                    {ing}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+            <Form {...form}>
+                <div className={`flex gap-2 ${isNarrow ? 'flex-col w-full' : 'items-end'}`}>
+                    <div className={`flex gap-2 ${isNarrow ? 'w-full' : ''}`}>
+                        <FormField
+                            control={form.control}
+                            name="ingredient.name"
+                            render={({field}) => (
+                                <FormItem
+                                    className={isNarrow ? 'w-full' : ''}>
+                                    <FormControl>
+                                        <Select
+                                            value={field.value}
+                                            onValueChange={field.onChange}
+                                        >
+                                            <SelectTrigger className={isNarrow ? 'w-full' : 'w-[150px]'}>
+                                                <SelectValue placeholder="Select ingredient"/>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {availableIngredients.map((ing) => (
+                                                    <SelectItem key={ing} value={ing}>
+                                                        {ing}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+
+                    <div className={`flex gap-2 w-full`}>
+                        <ValidatedNumberInput
+                            form={form}
+                            name={'quantity'}
+                            placeholder={'Qty'}
+                            condition={(value: number) => value > 0}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="unit.name"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <Select
+                                            value={field.value}
+                                            onValueChange={field.onChange}
+                                        >
+                                            <SelectTrigger className={`w-[120px] ${isNarrow ? 'flex-1' : ''}`}>
+                                                <SelectValue placeholder="Select unit"/>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {availableUnits.map((unit) => (
+                                                    <SelectItem key={unit} value={unit}>
+                                                        {unit}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+
+                        <Button
+                            type="button"
+                            variant="outline"
+                            disabled={!form.formState.isValid}
+                            onClick={() => form.handleSubmit(addIngredient)()}
+                        >
+                            <Plus className="w-4 h-4"/>
+                        </Button>
+                    </div>
                 </div>
-
-                <div className={`flex gap-2 w-full`}>
-                    <Input
-                        type="number"
-                        min="0"
-                        className="flex-1"
-                        placeholder="Qty"
-                        value={currentIngredient.quantity || ''}
-                        onChange={(e) =>
-                            setCurrentIngredient({
-                                ...currentIngredient,
-                                quantity: parseFloat(e.target.value),
-                            })
-                        }
-                    />
-
-                    <Select
-                        value={currentIngredient.unit.name}
-                        onValueChange={(value) =>
-                            setCurrentIngredient({...currentIngredient, unit: {name: value}})
-                        }
-                    >
-                        <SelectTrigger className={isNarrow ? 'flex-1' : 'w-[150px]'}>
-                            <SelectValue placeholder="Select unit"/>
-                        </SelectTrigger>
-                        <SelectContent>
-                            {availableUnits.map((unit) => (
-                                <SelectItem key={unit} value={unit}>
-                                    {unit}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-
-                    <Button
-                        type="button"
-                        onClick={addIngredient}
-                        variant="outline"
-                        disabled={
-                            !currentIngredient.ingredient.name ||
-                            !currentIngredient.quantity ||
-                            !currentIngredient.unit.name
-                        }
-                    >
-                        <Plus className="w-4 h-4"/>
-                    </Button>
-                </div>
-            </div>
+            </Form>
 
             {allowNewIngredients && (<div className="flex gap-2 mb-4">
                 <Input

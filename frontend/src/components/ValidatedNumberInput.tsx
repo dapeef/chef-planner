@@ -1,14 +1,14 @@
 import React from 'react';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { RecipeIngredient } from '@/lib/types';
 import { UseFormReturn } from 'react-hook-form';
 
 
 interface ValidatedNumberInputProps {
-    form: UseFormReturn<any, any, undefined>;
+    form: UseFormReturn<any>;
     name: string;
-    title: string;
+    title?: string | undefined;
+    placeholder?: string;
     condition?: (value: number) => boolean;
 }
 
@@ -16,6 +16,7 @@ const ValidatedNumberInput = ({
                                   form,
                                   name,
                                   title,
+                                  placeholder,
                                   condition = (value: number) => value >= 0,
                               }: ValidatedNumberInputProps) => {
     return (
@@ -26,14 +27,17 @@ const ValidatedNumberInput = ({
                 const [isEmpty, setIsEmpty] = React.useState(false);
 
                 return (
-                    <FormItem>
-                        <FormLabel>{title}</FormLabel>
+                    <FormItem
+                        className={'w-full'}
+                    >
+                        {title && <FormLabel>{title}</FormLabel>}
                         <FormControl>
                             <Input
                                 type="number"
                                 min="0"
                                 value={isEmpty ? '' : field.value}
-                                className={`${!condition(field.value) ? 'border-red-500' : ''}`}
+                                placeholder={placeholder}
+                                className={`w-full ${!condition(field.value) ? 'border-red-500' : ''}`}
                                 onChange={(e) => {
                                     const newValue = e.target.value;
                                     setIsEmpty(newValue === '');
