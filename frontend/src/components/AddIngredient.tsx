@@ -3,7 +3,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Plus, X } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { RecipeIngredient } from '@/lib/types';
 import { fetchIngredientStrings } from '@/lib/db';
 
@@ -33,6 +33,9 @@ const AddIngredient = ({
 
     const [availableIngredients, setAvailableIngredients] = useState<string[]>([]);
     const [availableUnits, setAvailableUnits] = useState<string[]>([]);
+
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [isNarrow, setIsNarrow] = useState(false);
 
     const addIngredient = () => {
         if (currentIngredient.ingredient.name && currentIngredient.quantity && currentIngredient.unit.name) {
@@ -78,83 +81,117 @@ const AddIngredient = ({
         }
     };
 
+    const createWidthUpdater = () => {
+        // Update based on container size
+        if (!containerRef.current) {
+            return;
+        }
+
+        const checkSize = () => {
+            const containerWidth = containerRef.current?.getBoundingClientRect().width;
+            if (!containerWidth) {
+                return;
+            }
+            setIsNarrow(containerWidth < 500);
+        };
+
+        // Check initial size
+        checkSize();
+
+        // Create ResizeObserver instance
+        const observer = new ResizeObserver(checkSize);
+
+        // Start observing the container
+        observer.observe(containerRef.current);
+
+        // Cleanup
+        return () => {
+            if (containerRef.current) {
+                observer.unobserve(containerRef.current);
+            }
+        };
+    };
+
     useEffect(() => {
         fetchIngredientStrings(setAvailableIngredients, setAvailableUnits);
+
+        createWidthUpdater();
     }, []); // Empty dependency array ensures it runs only once when the component mounts.
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4" ref={containerRef}>
             <FormLabel>Ingredients</FormLabel>
 
-            <div className="flex gap-2 items-end">
-                <Select
-                    value={currentIngredient.ingredient.name}
-                    onValueChange={(value) =>
-                        setCurrentIngredient({
-                            ...currentIngredient,
-                            ingredient: {
-                                name: value,
-                            },
-                        })
-                    }
-                >
-                    <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Select ingredient"/>
-                    </SelectTrigger>
-                    <SelectContent>
-                        {availableIngredients.map((ing) => (
-                            <SelectItem key={ing} value={ing}>
-                                {ing}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+            <div className={`flex gap-2 ${isNarrow ? 'flex-col' : 'items-end'}`}>
+                <div className={`flex gap-2 ${isNarrow ? 'w-full' : ''}`}>
+                    <Select
+                        value={currentIngredient.ingredient.name}
+                        onValueChange={(value) =>
+                            setCurrentIngredient({
+                                ...currentIngredient,
+                                ingredient: {name: value},
+                            })
+                        }
+                    >
+                        <SelectTrigger className={isNarrow ? 'w-full' : 'w-[180px]'}>
+                            <SelectValue placeholder="Select ingredient"/>
+                        </SelectTrigger>
+                        <SelectContent>
+                            {availableIngredients.map((ing) => (
+                                <SelectItem key={ing} value={ing}>
+                                    {ing}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
 
-                {/*TODO make this go red if empty*/}
-                <Input
-                    type="number"
-                    min="0"
-                    className="flex-1"
-                    placeholder="Qty"
-                    value={currentIngredient.quantity || ''}
-                    onChange={(e) =>
-                        setCurrentIngredient({
-                            ...currentIngredient,
-                            quantity: parseFloat(e.target.value),
-                        })
-                    }
-                />
+                <div className={`flex gap-2 w-full`}>
+                    <Input
+                        type="number"
+                        min="0"
+                        className="flex-1"
+                        placeholder="Qty"
+                        value={currentIngredient.quantity || ''}
+                        onChange={(e) =>
+                            setCurrentIngredient({
+                                ...currentIngredient,
+                                quantity: parseFloat(e.target.value),
+                            })
+                        }
+                    />
 
-                <Select
-                    value={currentIngredient.unit.name}
-                    onValueChange={(value) =>
-                        setCurrentIngredient({...currentIngredient, unit: {name: value}})
-                    }
-                >
-                    <SelectTrigger className="w-[150px]">
-                        <SelectValue placeholder="Select unit"/>
-                    </SelectTrigger>
-                    <SelectContent>
-                        {availableUnits.map((unit) => (
-                            <SelectItem key={unit} value={unit}>
-                                {unit}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+                    <Select
+                        value={currentIngredient.unit.name}
+                        onValueChange={(value) =>
+                            setCurrentIngredient({...currentIngredient, unit: {name: value}})
+                        }
+                    >
+                        <SelectTrigger className={isNarrow ? 'flex-1' : 'w-[150px]'}>
+                            <SelectValue placeholder="Select unit"/>
+                        </SelectTrigger>
+                        <SelectContent>
+                            {availableUnits.map((unit) => (
+                                <SelectItem key={unit} value={unit}>
+                                    {unit}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
 
-                <Button
-                    type="button"
-                    onClick={addIngredient}
-                    variant="outline"
-                    disabled={
-                        !currentIngredient.ingredient.name ||
-                        !currentIngredient.quantity ||
-                        !currentIngredient.unit.name
-                    }
-                >
-                    <Plus className="w-4 h-4"/>
-                </Button>
+                    <Button
+                        type="button"
+                        onClick={addIngredient}
+                        variant="outline"
+                        disabled={
+                            !currentIngredient.ingredient.name ||
+                            !currentIngredient.quantity ||
+                            !currentIngredient.unit.name
+                        }
+                    >
+                        <Plus className="w-4 h-4"/>
+                    </Button>
+                </div>
             </div>
 
             {allowNewIngredients && (<div className="flex gap-2 mb-4">
