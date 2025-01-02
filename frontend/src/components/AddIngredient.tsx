@@ -8,12 +8,14 @@ import { RecipeIngredient } from '@/lib/types';
 import { fetchIngredientStrings } from '@/lib/db';
 
 interface AddIngredientProps {
+    formName?: string;
     recipeIngredients: RecipeIngredient[];
     setRecipeIngredients: (value: React.SetStateAction<RecipeIngredient[]>) => void;
-    allowNewIngredients: boolean;
+    allowNewIngredients?: boolean;
 }
 
 const AddIngredient = ({
+                           formName = 'Ingredients',
                            recipeIngredients,
                            setRecipeIngredients,
                            allowNewIngredients = true,
@@ -120,7 +122,7 @@ const AddIngredient = ({
 
     return (
         <div className="space-y-4" ref={containerRef}>
-            <FormLabel>Ingredients</FormLabel>
+            <FormLabel>{formName}</FormLabel>
 
             <div className={`flex gap-2 ${isNarrow ? 'flex-col' : 'items-end'}`}>
                 <div className={`flex gap-2 ${isNarrow ? 'w-full' : ''}`}>

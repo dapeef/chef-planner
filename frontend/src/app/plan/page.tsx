@@ -131,6 +131,7 @@ const MealPlanForm: React.FC = () => {
                                 {/* Add ingredients */}
                                 <div className="p-4 border rounded space-y-4">
                                     <AddIngredient
+                                        formName="Existing ingredients"
                                         recipeIngredients={recipeIngredients}
                                         setRecipeIngredients={setRecipeIngredients}
                                         allowNewIngredients={false}
