@@ -26,6 +26,7 @@ import {
 } from '@/lib/types';
 import { createRecipe } from '@/lib/db';
 import AddIngredient from '@/components/AddIngredient';
+import ValidatedNumberInput from '@/components/ValidatedNumberInput';
 
 const RecipeForm = () => {
     const form = useForm<Recipe>({
@@ -118,88 +119,23 @@ const RecipeForm = () => {
                         />
 
                         <div className="grid grid-cols-3 gap-4">
-                            <FormField
-                                control={form.control}
-                                name="preparationTime"
-                                render={({field}) => {
-                                    const [isEmpty, setIsEmpty] = React.useState(false);
-
-                                    return (
-                                        <FormItem>
-                                            <FormLabel>Preparation time (mins)</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="number"
-                                                    min="0"
-                                                    value={isEmpty ? '' : field.value}
-                                                    className={`${field.value < 0 ? 'border-red-500' : ''}`}
-                                                    onChange={(e) => {
-                                                        const newValue = e.target.value;
-                                                        setIsEmpty(newValue === '');
-                                                        field.onChange(newValue === '' ? 0 : parseInt(newValue));
-                                                    }}
-                                                />
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    );
-                                }}
+                            <ValidatedNumberInput
+                                form={form}
+                                name={'preparationTime'}
+                                title={'Preparation time (mins)'}
                             />
 
-                            <FormField
-                                control={form.control}
-                                name="cookingTime"
-                                render={({field}) => {
-                                    const [isEmpty, setIsEmpty] = React.useState(false);
-
-                                    return (
-                                        <FormItem>
-                                            <FormLabel>Cooking time (mins)</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="number"
-                                                    min="0"
-                                                    value={isEmpty ? '' : field.value}
-                                                    className={`${field.value < 0 ? 'border-red-500' : ''}`}
-                                                    onChange={(e) => {
-                                                        const newValue = e.target.value;
-                                                        setIsEmpty(newValue === '');
-                                                        field.onChange(newValue === '' ? 0 : parseInt(newValue));
-                                                    }}
-                                                />
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    );
-                                }}
+                            <ValidatedNumberInput
+                                form={form}
+                                name={'cookingTime'}
+                                title={'Cooking time (mins)'}
                             />
 
-                            <FormField
-                                control={form.control}
-                                name="servings"
-                                render={({field}) => {
-                                    const [isEmpty, setIsEmpty] = React.useState(false);
-
-                                    return (
-                                        <FormItem>
-                                            <FormLabel>Servings</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="number"
-                                                    min="0"
-                                                    value={isEmpty ? '' : field.value}
-                                                    className={`${field.value <= 0 ? 'border-red-500' : ''}`}
-                                                    onChange={(e) => {
-                                                        const newValue = e.target.value;
-                                                        setIsEmpty(newValue === '');
-                                                        field.onChange(newValue === '' ? 0 : parseInt(newValue));
-                                                    }}
-                                                />
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    );
-                                }}
+                            <ValidatedNumberInput
+                                form={form}
+                                name={'servings'}
+                                title={'Servings'}
+                                condition={(value: number) => value > 0}
                             />
                         </div>
 

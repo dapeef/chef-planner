@@ -24,6 +24,7 @@ import { DateRange } from 'react-day-picker';
 import { addDays } from 'date-fns';
 import AddIngredient from '@/components/AddIngredient';
 import { RecipeIngredient } from '@/lib/types';
+import ValidatedNumberInput from '@/components/ValidatedNumberInput';
 
 // Define types for the form data
 interface DayConfig {
@@ -110,7 +111,7 @@ const MealPlanForm: React.FC = () => {
                                         name="dateRange"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>Select Date Range</FormLabel>
+                                                <FormLabel>Select date range</FormLabel>
                                                 <FormControl>
                                                     <Calendar
                                                         mode="range"
@@ -161,61 +162,22 @@ const MealPlanForm: React.FC = () => {
                                     </h3>
 
                                     <div className="grid grid-cols-3 gap-4">
-                                        <FormField
-                                            control={form.control}
+                                        <ValidatedNumberInput
+                                            form={form}
                                             name={`dailyConfigs.${index}.lunchMeals` as const}
-                                            render={({field}) => (
-                                                <FormItem>
-                                                    <FormLabel>Lunch meals</FormLabel>
-                                                    <FormControl>
-                                                        <Input
-                                                            type="number"
-                                                            min="0"
-                                                            {...field}
-                                                            className="w-full"
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage/>
-                                                </FormItem>
-                                            )}
+                                            title={'Lunch meals'}
                                         />
 
-                                        <FormField
-                                            control={form.control}
+                                        <ValidatedNumberInput
+                                            form={form}
                                             name={`dailyConfigs.${index}.dinnerMeals` as const}
-                                            render={({field}) => (
-                                                <FormItem>
-                                                    <FormLabel>Dinner meals</FormLabel>
-                                                    <FormControl>
-                                                        <Input
-                                                            type="number"
-                                                            min="0"
-                                                            {...field}
-                                                            className="w-full"
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage/>
-                                                </FormItem>
-                                            )}
+                                            title={'Dinner meals'}
                                         />
 
-                                        <FormField
-                                            control={form.control}
+                                        <ValidatedNumberInput
+                                            form={form}
                                             name={`dailyConfigs.${index}.prepTime` as const}
-                                            render={({field}) => (
-                                                <FormItem>
-                                                    <FormLabel>Available prep time (mins)</FormLabel>
-                                                    <FormControl>
-                                                        <Input
-                                                            type="number"
-                                                            min="0"
-                                                            {...field}
-                                                            className="w-full"
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage/>
-                                                </FormItem>
-                                            )}
+                                            title={'Available prep time (mins)'}
                                         />
                                     </div>
                                 </div>
